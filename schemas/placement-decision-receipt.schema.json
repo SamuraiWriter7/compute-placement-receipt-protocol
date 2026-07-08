@@ -1,0 +1,251 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/placement-decision-receipt.schema.json",
+
+  "title": "Placement Decision Receipt",
+
+  "description": "A minimal receipt that records why an AI workload was placed on a selected compute node.",
+
+  "type": "object",
+
+  "additionalProperties": false,
+
+  "required": [
+    "schema_version",
+    "protocol",
+    "placement_receipt_id",
+    "workload_ref",
+    "selected_node",
+    "placement_reason",
+    "constraint_refs",
+    "decision_at",
+    "decision_actor",
+    "evidence_refs"
+  ],
+
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "0.1"
+    },
+
+    "protocol": {
+      "type": "string",
+      "const": "compute-placement-receipt-protocol"
+    },
+
+    "placement_receipt_id": {
+      "type": "string",
+      "minLength": 1
+    },
+
+    "workload_ref": {
+      "type": "object",
+
+      "additionalProperties": false,
+
+      "required": [
+        "workload_id"
+      ],
+
+      "properties": {
+        "workload_id": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "task_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "model_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+
+    "selected_node": {
+      "type": "object",
+
+      "additionalProperties": false,
+
+      "required": [
+        "node_id",
+        "node_type"
+      ],
+
+      "properties": {
+        "node_id": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "node_type": {
+          "type": "string",
+
+          "enum": [
+            "edge_device",
+            "edge_cluster",
+            "regional_datacenter",
+            "cloud_region",
+            "gpu_cluster",
+            "npu_device",
+            "cpu_cluster",
+            "other"
+          ]
+        },
+
+        "provider": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "region": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+
+    "placement_reason": {
+      "type": "object",
+
+      "additionalProperties": false,
+
+      "required": [
+        "primary_reason",
+        "reason_codes",
+        "summary"
+      ],
+
+      "properties": {
+        "primary_reason": {
+          "type": "string",
+
+          "enum": [
+            "latency",
+            "capacity",
+            "cost",
+            "energy",
+            "carbon",
+            "data_residency",
+            "security_policy",
+            "network_condition",
+            "model_compatibility",
+            "availability",
+            "manual_override",
+            "other"
+          ]
+        },
+
+        "reason_codes": {
+          "type": "array",
+
+          "minItems": 1,
+
+          "uniqueItems": true,
+
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+
+    "constraint_refs": {
+      "type": "array",
+
+      "uniqueItems": true,
+
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+
+    "decision_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+
+    "decision_actor": {
+      "type": "object",
+
+      "additionalProperties": false,
+
+      "required": [
+        "actor_type",
+        "actor_id"
+      ],
+
+      "properties": {
+        "actor_type": {
+          "type": "string",
+
+          "enum": [
+            "scheduler",
+            "agent",
+            "human",
+            "policy_engine",
+            "hybrid"
+          ]
+        },
+
+        "actor_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+
+    "evidence_refs": {
+      "type": "array",
+
+      "items": {
+        "type": "object",
+
+        "additionalProperties": false,
+
+        "required": [
+          "evidence_type",
+          "ref"
+        ],
+
+        "properties": {
+          "evidence_type": {
+            "type": "string",
+
+            "enum": [
+              "scheduler_log",
+              "policy_snapshot",
+              "telemetry_snapshot",
+              "capacity_snapshot",
+              "energy_snapshot",
+              "network_snapshot",
+              "manual_record",
+              "other"
+            ]
+          },
+
+          "ref": {
+            "type": "string",
+            "minLength": 1
+          },
+
+          "digest": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}
