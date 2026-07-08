@@ -1,0 +1,147 @@
+schema_version: "0.3"
+
+protocol: "compute-placement-receipt-protocol"
+
+route_binding_id: "cprp-route-20260708-0001"
+
+
+task_ref:
+
+  task_id: "task-deep-research-042"
+
+  workload_id: "workload-research-042"
+
+  task_type: "research"
+
+  priority: "high"
+
+  latency_class: "interactive"
+
+
+model_selection:
+
+  model_id: "model-research-large-v3"
+
+  model_class: "large_model"
+
+  provider: "example-model-provider"
+
+  version: "3.0"
+
+  selection_reason_codes:
+
+    - "complex_multi_step_reasoning"
+
+    - "long_context_required"
+
+    - "tool_use_required"
+
+  selection_summary: >
+    A large reasoning-capable model was selected because the task
+    requires multi-step research, long-context processing, and tool use.
+
+
+compute_requirement:
+
+  accelerator_required: true
+
+  accelerator_classes:
+
+    - gpu
+
+  memory_requirement:
+
+    minimum_gb: 80
+
+    preferred_gb: 96
+
+    memory_type: "device_memory"
+
+  execution_mode: "single_node"
+
+  minimum_node_count: 1
+
+  preferred_node_count: 1
+
+  latency_ms_max: 30
+
+  data_residency:
+
+    - "JP"
+
+  security_class: "research-standard"
+
+  energy_policy_ref: "policy://energy/prefer-lower-cost-carbon-v1"
+
+
+compute_route:
+
+  selected_compute_type: "gpu"
+
+  execution_scope: "regional"
+
+  candidate_evaluation_ref: "cprp-eval-20260708-0001"
+
+  placement_receipt_ref: "cprp-20260708-0001"
+
+  route_policy_refs:
+
+    - "policy://model-routing/research-large-model-v1"
+
+    - "policy://data-residency/jp-only"
+
+    - "policy://latency/jp-interactive-v1"
+
+
+binding_reason:
+
+  primary_reason: "task_complexity"
+
+  reason_codes:
+
+    - "large_model_required"
+
+    - "gpu_acceleration_required"
+
+    - "minimum_80gb_device_memory"
+
+    - "regional_latency_policy"
+
+    - "jp_data_residency"
+
+  summary: >
+    The research task required a large reasoning model and GPU execution
+    with at least 80 GB of device memory. Regional execution in Japan
+    was selected to satisfy latency and data residency constraints.
+
+
+bound_at: "2026-07-08T00:29:00Z"
+
+
+binding_actor:
+
+  actor_type: "orchestrator"
+
+  actor_id: "model-compute-router-alpha"
+
+
+evidence_refs:
+
+  - evidence_type: "task_profile"
+
+    ref: "evidence://task/task-deep-research-042/profile"
+
+
+  - evidence_type: "model_profile"
+
+    ref: "evidence://model/model-research-large-v3/profile"
+
+
+  - evidence_type: "compatibility_record"
+
+    ref: "evidence://compatibility/model-research-large-v3/gpu"
+
+
+  - evidence_type: "policy_snapshot"
+
+    ref: "policy-snapshot://model-routing/research-v2/20260708"
