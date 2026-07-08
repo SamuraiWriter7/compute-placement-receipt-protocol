@@ -1,0 +1,302 @@
+schema_version: "0.2"
+
+protocol: "compute-placement-receipt-protocol"
+
+evaluation_id: "cprp-eval-20260708-0001"
+
+placement_receipt_ref: "cprp-20260708-0001"
+
+
+workload_ref:
+
+  workload_id: "workload-research-042"
+
+  task_ref: "task-deep-research-042"
+
+  model_ref: "model-research-large-v3"
+
+
+evaluation_dimensions:
+
+  - latency
+  - capacity
+  - memory
+  - energy_cost
+  - carbon_intensity
+  - data_residency
+  - network_condition
+
+
+candidates:
+
+  - node_id: "tokyo-gpu-001"
+
+    node_type: "gpu_cluster"
+
+    provider: "example-provider"
+
+    region: "JP-TYO"
+
+    eligibility:
+
+      status: "eligible"
+
+      failed_constraints: []
+
+      conditions: []
+
+    evaluation_results:
+
+      - dimension: "latency"
+
+        status: "preferred"
+
+        observed_value: 8
+
+        unit: "ms"
+
+        policy_ref: "policy://latency/jp-interactive-v1"
+
+        evidence_ref: "evidence://network/tokyo-gpu-001/20260708T003000Z"
+
+      - dimension: "capacity"
+
+        status: "warning"
+
+        observed_value: 87
+
+        unit: "percent-utilized"
+
+        evidence_ref: "evidence://capacity/tokyo-gpu-001/20260708T003000Z"
+
+        note: "Node remained eligible but showed significant capacity pressure."
+
+      - dimension: "energy_cost"
+
+        status: "acceptable"
+
+        observed_value: 0.19
+
+        unit: "normalized-cost-index"
+
+        evidence_ref: "evidence://energy/jp-tyo/20260708T003000Z"
+
+    decision:
+
+      status: "rejected"
+
+      reason_codes:
+
+        - "capacity_pressure"
+
+        - "higher_projected_energy_cost"
+
+      summary: >
+        The node satisfied hard placement constraints but was not selected
+        because of higher capacity pressure and projected energy cost.
+
+
+  - node_id: "osaka-gpu-002"
+
+    node_type: "gpu_cluster"
+
+    provider: "example-provider"
+
+    region: "JP-OSA"
+
+    eligibility:
+
+      status: "eligible"
+
+      failed_constraints: []
+
+      conditions: []
+
+    evaluation_results:
+
+      - dimension: "latency"
+
+        status: "acceptable"
+
+        observed_value: 18
+
+        unit: "ms"
+
+        policy_ref: "policy://latency/jp-interactive-v1"
+
+      - dimension: "capacity"
+
+        status: "acceptable"
+
+        observed_value: 63
+
+        unit: "percent-utilized"
+
+      - dimension: "energy_cost"
+
+        status: "warning"
+
+        observed_value: 0.23
+
+        unit: "normalized-cost-index"
+
+        policy_ref: "policy://energy/max-cost-index-v1"
+
+    decision:
+
+      status: "rejected"
+
+      reason_codes:
+
+        - "energy_cost_threshold"
+
+      summary: >
+        The node met workload capacity and latency requirements,
+        but its projected energy cost was less favorable.
+
+
+  - node_id: "fukuoka-gpu-003"
+
+    node_type: "gpu_cluster"
+
+    provider: "example-provider"
+
+    region: "JP-FUK"
+
+    eligibility:
+
+      status: "eligible"
+
+      failed_constraints: []
+
+      conditions: []
+
+    evaluation_results:
+
+      - dimension: "latency"
+
+        status: "acceptable"
+
+        observed_value: 27
+
+        unit: "ms"
+
+        policy_ref: "policy://latency/jp-interactive-v1"
+
+        evidence_ref: "evidence://network/apn-route-17/20260708T003000Z"
+
+      - dimension: "capacity"
+
+        status: "preferred"
+
+        observed_value: 41
+
+        unit: "percent-utilized"
+
+        evidence_ref: "evidence://capacity/fukuoka-gpu-003/20260708T003000Z"
+
+      - dimension: "memory"
+
+        status: "pass"
+
+        observed_value: 80
+
+        unit: "GB"
+
+        policy_ref: "policy://gpu-memory/min-80gb"
+
+      - dimension: "energy_cost"
+
+        status: "preferred"
+
+        observed_value: 0.12
+
+        unit: "normalized-cost-index"
+
+        evidence_ref: "evidence://energy/jp-fuk/20260708T003000Z"
+
+      - dimension: "carbon_intensity"
+
+        status: "preferred"
+
+        observed_value: 0.34
+
+        unit: "normalized-carbon-index"
+
+        evidence_ref: "evidence://carbon/jp-fuk/20260708T003000Z"
+
+      - dimension: "data_residency"
+
+        status: "pass"
+
+        observed_value: "JP"
+
+        policy_ref: "policy://data-residency/jp-only"
+
+    decision:
+
+      status: "selected"
+
+      reason_codes:
+
+        - "sufficient_gpu_memory"
+
+        - "latency_within_policy"
+
+        - "lower_capacity_pressure"
+
+        - "lower_energy_cost"
+
+        - "lower_carbon_intensity"
+
+      summary: >
+        The node satisfied all required constraints and provided
+        the preferred balance of available capacity, energy cost,
+        and carbon intensity.
+
+
+selected_candidate:
+
+  node_id: "fukuoka-gpu-003"
+
+  selection_summary: >
+    Selected because it satisfied workload requirements and offered
+    the most favorable evaluated balance across capacity, energy cost,
+    and carbon intensity while remaining within latency policy.
+
+
+evaluation_at: "2026-07-08T00:29:30Z"
+
+
+evaluator:
+
+  actor_type: "scheduler"
+
+  actor_id: "placement-scheduler-alpha"
+
+
+evidence_refs:
+
+  - evidence_type: "capacity_snapshot"
+
+    ref: "evidence://capacity/jp-distributed-gpu/20260708T003000Z"
+
+
+  - evidence_type: "energy_snapshot"
+
+    ref: "evidence://energy/jp-regions/20260708T003000Z"
+
+
+  - evidence_type: "carbon_snapshot"
+
+    ref: "evidence://carbon/jp-regions/20260708T003000Z"
+
+
+  - evidence_type: "network_snapshot"
+
+    ref: "evidence://network/apn-national/20260708T003000Z"
+
+
+  - evidence_type: "policy_snapshot"
+
+    ref: "policy-snapshot://placement-policy-jp-v3/20260708"
