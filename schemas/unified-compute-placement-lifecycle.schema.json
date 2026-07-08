@@ -1,0 +1,619 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/unified-compute-placement-lifecycle.schema.json",
+
+  "title": "Unified Compute Placement Lifecycle",
+
+  "description": "A lifecycle envelope that links model-to-compute routing, candidate evaluation, placement decisions, execution transitions, migrations, completion, and placement audit records.",
+
+  "type": "object",
+
+  "additionalProperties": false,
+
+  "required": [
+    "schema_version",
+    "protocol",
+    "lifecycle_id",
+    "workload_ref",
+    "lifecycle_status",
+    "phase_records",
+    "transition_chain",
+    "integrity",
+    "outcome",
+    "audit_summary",
+    "created_at",
+    "updated_at",
+    "evidence_refs"
+  ],
+
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "0.5"
+    },
+
+    "protocol": {
+      "type": "string",
+      "const": "compute-placement-receipt-protocol"
+    },
+
+    "lifecycle_id": {
+      "type": "string",
+      "minLength": 1
+    },
+
+    "parent_lifecycle_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+
+    "workload_ref": {
+      "type": "object",
+
+      "additionalProperties": false,
+
+      "required": [
+        "workload_id"
+      ],
+
+      "properties": {
+        "workload_id": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "task_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "origin_trace_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "agent_handoff_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "execution_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "artifact_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+
+    "lifecycle_status": {
+      "type": "string",
+
+      "enum": [
+        "planned",
+        "routing",
+        "evaluating",
+        "placed",
+        "executing",
+        "rebalancing",
+        "migrating",
+        "completing",
+        "completed",
+        "completed_with_warning",
+        "failed",
+        "cancelled"
+      ]
+    },
+
+    "phase_records": {
+      "type": "object",
+
+      "additionalProperties": false,
+
+      "required": [
+        "route_binding",
+        "candidate_evaluation",
+        "initial_placement"
+      ],
+
+      "properties": {
+        "route_binding": {
+          "$ref": "#/$defs/phaseReference"
+        },
+
+        "candidate_evaluation": {
+          "$ref": "#/$defs/phaseReference"
+        },
+
+        "initial_placement": {
+          "$ref": "#/$defs/phaseReference"
+        },
+
+        "execution": {
+          "$ref": "#/$defs/phaseReference"
+        },
+
+        "runtime_observation": {
+          "$ref": "#/$defs/phaseReference"
+        },
+
+        "migration_records": {
+          "type": "array",
+
+          "items": {
+            "$ref": "#/$defs/phaseReference"
+          }
+        },
+
+        "completion": {
+          "$ref": "#/$defs/phaseReference"
+        },
+
+        "placement_audit": {
+          "$ref": "#/$defs/phaseReference"
+        }
+      }
+    },
+
+    "transition_chain": {
+      "type": "array",
+
+      "minItems": 1,
+
+      "items": {
+        "type": "object",
+
+        "additionalProperties": false,
+
+        "required": [
+          "transition_id",
+          "from_phase",
+          "to_phase",
+          "transition_type",
+          "occurred_at"
+        ],
+
+        "properties": {
+          "transition_id": {
+            "type": "string",
+            "minLength": 1
+          },
+
+          "from_phase": {
+            "type": "string",
+
+            "enum": [
+              "intent",
+              "route_binding",
+              "candidate_evaluation",
+              "placement",
+              "execution",
+              "observation",
+              "re_evaluation",
+              "rebalancing",
+              "migration",
+              "completion",
+              "audit"
+            ]
+          },
+
+          "to_phase": {
+            "type": "string",
+
+            "enum": [
+              "route_binding",
+              "candidate_evaluation",
+              "placement",
+              "execution",
+              "observation",
+              "re_evaluation",
+              "rebalancing",
+              "migration",
+              "completion",
+              "audit",
+              "closed"
+            ]
+          },
+
+          "transition_type": {
+            "type": "string",
+
+            "enum": [
+              "normal",
+              "adaptive",
+              "policy_triggered",
+              "failure_triggered",
+              "manual",
+              "emergency",
+              "completion",
+              "closure",
+              "other"
+            ]
+          },
+
+          "trigger_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+
+          "decision_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+
+          "receipt_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+
+    "integrity": {
+      "type": "object",
+
+      "additionalProperties": false,
+
+      "required": [
+        "chain_status",
+        "reference_status",
+        "evidence_status"
+      ],
+
+      "properties": {
+        "chain_status": {
+          "type": "string",
+
+          "enum": [
+            "complete",
+            "complete_with_warning",
+            "partial",
+            "broken",
+            "not_verified"
+          ]
+        },
+
+        "reference_status": {
+          "type": "string",
+
+          "enum": [
+            "resolved",
+            "partially_resolved",
+            "unresolved",
+            "not_checked"
+          ]
+        },
+
+        "evidence_status": {
+          "type": "string",
+
+          "enum": [
+            "sufficient",
+            "sufficient_with_warning",
+            "partial",
+            "insufficient",
+            "not_reviewed"
+          ]
+        },
+
+        "missing_refs": {
+          "type": "array",
+
+          "uniqueItems": true,
+
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+
+        "warnings": {
+          "type": "array",
+
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+
+        "verification_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+
+    "outcome": {
+      "type": "object",
+
+      "additionalProperties": false,
+
+      "required": [
+        "status",
+        "final_placement",
+        "completion_reason",
+        "summary"
+      ],
+
+      "properties": {
+        "status": {
+          "type": "string",
+
+          "enum": [
+            "successful",
+            "successful_with_migration",
+            "successful_with_warning",
+            "partially_successful",
+            "failed",
+            "cancelled"
+          ]
+        },
+
+        "final_placement": {
+          "type": "object",
+
+          "additionalProperties": false,
+
+          "required": [
+            "node_id",
+            "node_type"
+          ],
+
+          "properties": {
+            "node_id": {
+              "type": "string",
+              "minLength": 1
+            },
+
+            "node_type": {
+              "type": "string",
+
+              "enum": [
+                "edge_device",
+                "edge_cluster",
+                "regional_datacenter",
+                "cloud_region",
+                "gpu_cluster",
+                "npu_device",
+                "cpu_cluster",
+                "distributed_fabric",
+                "other"
+              ]
+            },
+
+            "region": {
+              "type": "string",
+              "minLength": 1
+            },
+
+            "placement_receipt_ref": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+
+        "completion_reason": {
+          "type": "string",
+
+          "enum": [
+            "workload_completed",
+            "policy_terminated",
+            "operator_cancelled",
+            "execution_failed",
+            "resource_unavailable",
+            "security_termination",
+            "other"
+          ]
+        },
+
+        "artifact_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+
+    "audit_summary": {
+      "type": "object",
+
+      "additionalProperties": false,
+
+      "required": [
+        "audit_status",
+        "placement_explainability",
+        "migration_explainability",
+        "policy_traceability",
+        "summary"
+      ],
+
+      "properties": {
+        "audit_status": {
+          "type": "string",
+
+          "enum": [
+            "ready",
+            "ready_with_warning",
+            "partial",
+            "not_ready",
+            "not_reviewed"
+          ]
+        },
+
+        "placement_explainability": {
+          "type": "string",
+
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient",
+            "not_applicable"
+          ]
+        },
+
+        "migration_explainability": {
+          "type": "string",
+
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient",
+            "not_applicable"
+          ]
+        },
+
+        "policy_traceability": {
+          "type": "string",
+
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient"
+          ]
+        },
+
+        "reviewer_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "audit_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+
+    "closed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+
+    "evidence_refs": {
+      "type": "array",
+
+      "items": {
+        "type": "object",
+
+        "additionalProperties": false,
+
+        "required": [
+          "evidence_type",
+          "ref"
+        ],
+
+        "properties": {
+          "evidence_type": {
+            "type": "string",
+
+            "enum": [
+              "route_binding_record",
+              "candidate_evaluation_record",
+              "placement_receipt",
+              "execution_record",
+              "telemetry_record",
+              "migration_receipt",
+              "completion_record",
+              "audit_record",
+              "policy_snapshot",
+              "integrity_verification",
+              "other"
+            ]
+          },
+
+          "ref": {
+            "type": "string",
+            "minLength": 1
+          },
+
+          "digest": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  },
+
+  "$defs": {
+    "phaseReference": {
+      "type": "object",
+
+      "additionalProperties": false,
+
+      "required": [
+        "status",
+        "ref"
+      ],
+
+      "properties": {
+        "status": {
+          "type": "string",
+
+          "enum": [
+            "planned",
+            "active",
+            "completed",
+            "completed_with_warning",
+            "failed",
+            "skipped",
+            "not_applicable"
+          ]
+        },
+
+        "ref": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "started_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+
+        "completed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}
