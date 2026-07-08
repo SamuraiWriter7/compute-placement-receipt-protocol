@@ -1,0 +1,391 @@
+schema_version: "0.5"
+
+protocol: "compute-placement-receipt-protocol"
+
+lifecycle_id: "cprp-lifecycle-20260708-0001"
+
+
+workload_ref:
+
+  workload_id: "workload-research-042"
+
+  task_ref: "task-deep-research-042"
+
+  origin_trace_ref: "trace://research-question-042"
+
+  agent_handoff_ref: "handoff://research-agent/042"
+
+  execution_ref: "execution-research-042-01"
+
+  artifact_ref: "artifact://research-report-042"
+
+
+lifecycle_status: "completed"
+
+
+phase_records:
+
+  route_binding:
+
+    status: "completed"
+
+    ref: "cprp-route-20260708-0001"
+
+    started_at: "2026-07-08T00:28:40Z"
+
+    completed_at: "2026-07-08T00:29:00Z"
+
+    summary: >
+      The research task was bound to a large reasoning model and
+      regional GPU execution requirements.
+
+
+  candidate_evaluation:
+
+    status: "completed"
+
+    ref: "cprp-eval-20260708-0001"
+
+    started_at: "2026-07-08T00:29:01Z"
+
+    completed_at: "2026-07-08T00:29:30Z"
+
+    summary: >
+      Tokyo, Osaka, and Fukuoka GPU candidates were evaluated.
+
+
+  initial_placement:
+
+    status: "completed"
+
+    ref: "cprp-20260708-0001"
+
+    started_at: "2026-07-08T00:29:31Z"
+
+    completed_at: "2026-07-08T00:30:30Z"
+
+    summary: >
+      The workload was initially placed on fukuoka-gpu-003.
+
+
+  execution:
+
+    status: "completed_with_warning"
+
+    ref: "execution://workload-research-042/run-01"
+
+    started_at: "2026-07-08T00:30:30Z"
+
+    completed_at: "2026-07-08T01:21:00Z"
+
+    summary: >
+      Execution completed successfully after one adaptive migration.
+
+
+  runtime_observation:
+
+    status: "completed"
+
+    ref: "observation://workload-research-042/runtime-series-01"
+
+    started_at: "2026-07-08T00:30:30Z"
+
+    completed_at: "2026-07-08T01:21:00Z"
+
+    summary: >
+      Runtime telemetry detected increasing capacity pressure and queue depth.
+
+
+  migration_records:
+
+    - status: "completed"
+
+      ref: "cprp-migration-20260708-0001"
+
+      started_at: "2026-07-08T01:02:00Z"
+
+      completed_at: "2026-07-08T01:05:42Z"
+
+      summary: >
+        The workload was migrated from Fukuoka to Kanazawa after
+        adaptive re-evaluation.
+
+
+  completion:
+
+    status: "completed"
+
+    ref: "completion://workload-research-042"
+
+    started_at: "2026-07-08T01:21:00Z"
+
+    completed_at: "2026-07-08T01:21:20Z"
+
+    summary: >
+      The workload completed and produced the expected research artifact.
+
+
+  placement_audit:
+
+    status: "completed"
+
+    ref: "audit://compute-placement/workload-research-042"
+
+    started_at: "2026-07-08T01:21:21Z"
+
+    completed_at: "2026-07-08T01:22:00Z"
+
+    summary: >
+      Route, candidate selection, initial placement, and migration
+      reasoning were successfully traced.
+
+
+transition_chain:
+
+  - transition_id: "transition-001"
+
+    from_phase: "intent"
+
+    to_phase: "route_binding"
+
+    transition_type: "normal"
+
+    receipt_ref: "cprp-route-20260708-0001"
+
+    occurred_at: "2026-07-08T00:28:40Z"
+
+    summary: "Task intent entered model-to-compute routing."
+
+
+  - transition_id: "transition-002"
+
+    from_phase: "route_binding"
+
+    to_phase: "candidate_evaluation"
+
+    transition_type: "normal"
+
+    receipt_ref: "cprp-eval-20260708-0001"
+
+    occurred_at: "2026-07-08T00:29:01Z"
+
+    summary: "Compute requirements were passed to candidate evaluation."
+
+
+  - transition_id: "transition-003"
+
+    from_phase: "candidate_evaluation"
+
+    to_phase: "placement"
+
+    transition_type: "normal"
+
+    receipt_ref: "cprp-20260708-0001"
+
+    occurred_at: "2026-07-08T00:29:31Z"
+
+    summary: "Fukuoka GPU was selected for initial placement."
+
+
+  - transition_id: "transition-004"
+
+    from_phase: "placement"
+
+    to_phase: "execution"
+
+    transition_type: "normal"
+
+    occurred_at: "2026-07-08T00:30:30Z"
+
+    summary: "Execution started on the initial compute placement."
+
+
+  - transition_id: "transition-005"
+
+    from_phase: "observation"
+
+    to_phase: "re_evaluation"
+
+    transition_type: "adaptive"
+
+    trigger_ref: "trigger://capacity/fukuoka-gpu-003/20260708T010200Z"
+
+    decision_ref: "cprp-migration-20260708-0001"
+
+    occurred_at: "2026-07-08T01:02:00Z"
+
+    summary: >
+      Capacity pressure and queue growth triggered adaptive re-evaluation.
+
+
+  - transition_id: "transition-006"
+
+    from_phase: "re_evaluation"
+
+    to_phase: "migration"
+
+    transition_type: "adaptive"
+
+    receipt_ref: "cprp-migration-20260708-0001"
+
+    occurred_at: "2026-07-08T01:03:40Z"
+
+    summary: "Migration to Kanazawa was approved."
+
+
+  - transition_id: "transition-007"
+
+    from_phase: "migration"
+
+    to_phase: "execution"
+
+    transition_type: "adaptive"
+
+    receipt_ref: "cprp-migration-20260708-0001"
+
+    occurred_at: "2026-07-08T01:05:42Z"
+
+    summary: "Execution resumed on the destination placement."
+
+
+  - transition_id: "transition-008"
+
+    from_phase: "execution"
+
+    to_phase: "completion"
+
+    transition_type: "completion"
+
+    occurred_at: "2026-07-08T01:21:00Z"
+
+    summary: "Workload execution completed."
+
+
+  - transition_id: "transition-009"
+
+    from_phase: "completion"
+
+    to_phase: "audit"
+
+    transition_type: "normal"
+
+    receipt_ref: "audit://compute-placement/workload-research-042"
+
+    occurred_at: "2026-07-08T01:21:21Z"
+
+    summary: "Placement lifecycle entered audit review."
+
+
+  - transition_id: "transition-010"
+
+    from_phase: "audit"
+
+    to_phase: "closed"
+
+    transition_type: "closure"
+
+    occurred_at: "2026-07-08T01:22:00Z"
+
+    summary: "Lifecycle was closed after successful audit."
+
+
+integrity:
+
+  chain_status: "complete"
+
+  reference_status: "resolved"
+
+  evidence_status: "sufficient"
+
+  missing_refs: []
+
+  warnings: []
+
+  verification_ref: "verification://cprp-lifecycle-20260708-0001"
+
+
+outcome:
+
+  status: "successful_with_migration"
+
+  final_placement:
+
+    node_id: "kanazawa-gpu-004"
+
+    node_type: "gpu_cluster"
+
+    region: "JP-KNZ"
+
+    placement_receipt_ref: "cprp-20260708-0002"
+
+  completion_reason: "workload_completed"
+
+  artifact_ref: "artifact://research-report-042"
+
+  summary: >
+    The workload completed successfully after one adaptive migration
+    from Fukuoka to Kanazawa.
+
+
+audit_summary:
+
+  audit_status: "ready"
+
+  placement_explainability: "complete"
+
+  migration_explainability: "complete"
+
+  policy_traceability: "complete"
+
+  reviewer_ref: "reviewer://placement-audit-agent-01"
+
+  audit_ref: "audit://compute-placement/workload-research-042"
+
+  summary: >
+    The complete placement lifecycle is traceable from model routing
+    through candidate evaluation, initial placement, runtime migration,
+    completion, and final audit.
+
+
+created_at: "2026-07-08T00:28:40Z"
+
+updated_at: "2026-07-08T01:22:00Z"
+
+closed_at: "2026-07-08T01:22:00Z"
+
+
+evidence_refs:
+
+  - evidence_type: "route_binding_record"
+
+    ref: "cprp-route-20260708-0001"
+
+
+  - evidence_type: "candidate_evaluation_record"
+
+    ref: "cprp-eval-20260708-0001"
+
+
+  - evidence_type: "placement_receipt"
+
+    ref: "cprp-20260708-0001"
+
+
+  - evidence_type: "migration_receipt"
+
+    ref: "cprp-migration-20260708-0001"
+
+
+  - evidence_type: "completion_record"
+
+    ref: "completion://workload-research-042"
+
+
+  - evidence_type: "audit_record"
+
+    ref: "audit://compute-placement/workload-research-042"
+
+
+  - evidence_type: "integrity_verification"
+
+    ref: "verification://cprp-lifecycle-20260708-0001"
