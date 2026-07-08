@@ -1,0 +1,82 @@
+schema_version: "0.1"
+
+protocol: "compute-placement-receipt-protocol"
+
+placement_receipt_id: "cprp-20260708-0001"
+
+
+workload_ref:
+
+  workload_id: "workload-research-042"
+
+  task_ref: "task-deep-research-042"
+
+  model_ref: "model-research-large-v3"
+
+
+selected_node:
+
+  node_id: "fukuoka-gpu-003"
+
+  node_type: "gpu_cluster"
+
+  provider: "example-provider"
+
+  region: "JP-FUK"
+
+
+placement_reason:
+
+  primary_reason: "energy"
+
+  reason_codes:
+
+    - "sufficient_gpu_memory"
+
+    - "latency_within_policy"
+
+    - "lower_energy_cost"
+
+    - "lower_carbon_intensity"
+
+  summary: >
+    The node satisfied workload capacity and latency constraints while
+    offering a lower projected energy cost and carbon intensity.
+
+
+constraint_refs:
+
+  - "policy://latency/jp-interactive-v1"
+
+  - "policy://gpu-memory/min-80gb"
+
+  - "policy://data-residency/jp-only"
+
+  - "policy://carbon/prefer-lower-intensity"
+
+
+decision_at: "2026-07-08T00:30:00Z"
+
+
+decision_actor:
+
+  actor_type: "scheduler"
+
+  actor_id: "placement-scheduler-alpha"
+
+
+evidence_refs:
+
+  - evidence_type: "capacity_snapshot"
+
+    ref: "evidence://capacity/fukuoka-gpu-003/20260708T003000Z"
+
+
+  - evidence_type: "energy_snapshot"
+
+    ref: "evidence://energy/jp-fuk/20260708T003000Z"
+
+
+  - evidence_type: "network_snapshot"
+
+    ref: "evidence://network/apn-route-17/20260708T003000Z"
