@@ -1,0 +1,607 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/rebalancing-migration-receipt.schema.json",
+
+  "title": "Rebalancing and Migration Receipt",
+
+  "description": "A machine-readable receipt for recording why an active AI workload was rebalanced or migrated between compute placements.",
+
+  "type": "object",
+
+  "additionalProperties": false,
+
+  "required": [
+    "schema_version",
+    "protocol",
+    "migration_receipt_id",
+    "workload_ref",
+    "previous_placement",
+    "trigger",
+    "re_evaluation",
+    "migration_decision",
+    "destination_placement",
+    "migration_execution",
+    "decided_at",
+    "decision_actor",
+    "evidence_refs"
+  ],
+
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "0.4"
+    },
+
+    "protocol": {
+      "type": "string",
+      "const": "compute-placement-receipt-protocol"
+    },
+
+    "migration_receipt_id": {
+      "type": "string",
+      "minLength": 1
+    },
+
+    "previous_migration_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+
+    "route_binding_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+
+    "previous_placement_receipt_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+
+    "candidate_evaluation_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+
+    "workload_ref": {
+      "type": "object",
+
+      "additionalProperties": false,
+
+      "required": [
+        "workload_id"
+      ],
+
+      "properties": {
+        "workload_id": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "task_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "model_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "execution_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+
+    "previous_placement": {
+      "type": "object",
+
+      "additionalProperties": false,
+
+      "required": [
+        "node_id",
+        "node_type"
+      ],
+
+      "properties": {
+        "node_id": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "node_type": {
+          "type": "string",
+
+          "enum": [
+            "edge_device",
+            "edge_cluster",
+            "regional_datacenter",
+            "cloud_region",
+            "gpu_cluster",
+            "npu_device",
+            "cpu_cluster",
+            "distributed_fabric",
+            "other"
+          ]
+        },
+
+        "region": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "placement_started_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+
+    "trigger": {
+      "type": "object",
+
+      "additionalProperties": false,
+
+      "required": [
+        "trigger_type",
+        "trigger_codes",
+        "detected_at",
+        "summary"
+      ],
+
+      "properties": {
+        "trigger_type": {
+          "type": "string",
+
+          "enum": [
+            "capacity",
+            "network",
+            "energy",
+            "carbon",
+            "cost",
+            "failure",
+            "maintenance",
+            "security",
+            "policy",
+            "workload_change",
+            "model_change",
+            "manual_intervention",
+            "optimization",
+            "other"
+          ]
+        },
+
+        "trigger_codes": {
+          "type": "array",
+
+          "minItems": 1,
+
+          "uniqueItems": true,
+
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+
+        "severity": {
+          "type": "string",
+
+          "enum": [
+            "informational",
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ]
+        },
+
+        "detected_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+
+    "state_change": {
+      "type": "array",
+
+      "items": {
+        "type": "object",
+
+        "additionalProperties": false,
+
+        "required": [
+          "dimension",
+          "before",
+          "after"
+        ],
+
+        "properties": {
+          "dimension": {
+            "type": "string",
+
+            "enum": [
+              "latency",
+              "capacity",
+              "memory_pressure",
+              "queue_depth",
+              "energy_cost",
+              "carbon_intensity",
+              "financial_cost",
+              "network_condition",
+              "availability",
+              "reliability",
+              "security_state",
+              "policy_state",
+              "workload_priority",
+              "model_requirement",
+              "other"
+            ]
+          },
+
+          "before": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean"
+            ]
+          },
+
+          "after": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean"
+            ]
+          },
+
+          "unit": {
+            "type": "string",
+            "minLength": 1
+          },
+
+          "threshold_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+
+          "evidence_ref": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+
+    "re_evaluation": {
+      "type": "object",
+
+      "additionalProperties": false,
+
+      "required": [
+        "required",
+        "evaluation_status"
+      ],
+
+      "properties": {
+        "required": {
+          "type": "boolean"
+        },
+
+        "evaluation_status": {
+          "type": "string",
+
+          "enum": [
+            "not_required",
+            "completed",
+            "partial",
+            "emergency_bypass"
+          ]
+        },
+
+        "candidate_evaluation_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "policy_refs": {
+          "type": "array",
+
+          "uniqueItems": true,
+
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+
+    "migration_decision": {
+      "type": "object",
+
+      "additionalProperties": false,
+
+      "required": [
+        "decision",
+        "decision_mode",
+        "reason_codes",
+        "summary"
+      ],
+
+      "properties": {
+        "decision": {
+          "type": "string",
+
+          "enum": [
+            "migrate",
+            "rebalance",
+            "replicate",
+            "scale_out",
+            "scale_in",
+            "remain",
+            "terminate"
+          ]
+        },
+
+        "decision_mode": {
+          "type": "string",
+
+          "enum": [
+            "planned",
+            "adaptive",
+            "emergency",
+            "manual",
+            "policy_enforced"
+          ]
+        },
+
+        "reason_codes": {
+          "type": "array",
+
+          "minItems": 1,
+
+          "uniqueItems": true,
+
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+
+    "destination_placement": {
+      "type": "object",
+
+      "additionalProperties": false,
+
+      "required": [
+        "node_id",
+        "node_type",
+        "selection_summary"
+      ],
+
+      "properties": {
+        "node_id": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "node_type": {
+          "type": "string",
+
+          "enum": [
+            "edge_device",
+            "edge_cluster",
+            "regional_datacenter",
+            "cloud_region",
+            "gpu_cluster",
+            "npu_device",
+            "cpu_cluster",
+            "distributed_fabric",
+            "other"
+          ]
+        },
+
+        "region": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "placement_receipt_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "selection_summary": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+
+    "migration_execution": {
+      "type": "object",
+
+      "additionalProperties": false,
+
+      "required": [
+        "strategy",
+        "status",
+        "state_preservation"
+      ],
+
+      "properties": {
+        "strategy": {
+          "type": "string",
+
+          "enum": [
+            "cold_migration",
+            "warm_migration",
+            "live_migration",
+            "checkpoint_restore",
+            "replica_handoff",
+            "traffic_shift",
+            "restart_at_destination",
+            "other"
+          ]
+        },
+
+        "status": {
+          "type": "string",
+
+          "enum": [
+            "planned",
+            "in_progress",
+            "completed",
+            "completed_with_warning",
+            "failed",
+            "rolled_back"
+          ]
+        },
+
+        "state_preservation": {
+          "type": "string",
+
+          "enum": [
+            "full",
+            "partial",
+            "none",
+            "not_applicable",
+            "unknown"
+          ]
+        },
+
+        "started_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+
+        "completed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+
+        "execution_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "rollback_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+
+    "decided_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+
+    "decision_actor": {
+      "type": "object",
+
+      "additionalProperties": false,
+
+      "required": [
+        "actor_type",
+        "actor_id"
+      ],
+
+      "properties": {
+        "actor_type": {
+          "type": "string",
+
+          "enum": [
+            "scheduler",
+            "agent",
+            "orchestrator",
+            "policy_engine",
+            "human",
+            "hybrid"
+          ]
+        },
+
+        "actor_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+
+    "evidence_refs": {
+      "type": "array",
+
+      "items": {
+        "type": "object",
+
+        "additionalProperties": false,
+
+        "required": [
+          "evidence_type",
+          "ref"
+        ],
+
+        "properties": {
+          "evidence_type": {
+            "type": "string",
+
+            "enum": [
+              "telemetry_snapshot",
+              "capacity_snapshot",
+              "network_snapshot",
+              "energy_snapshot",
+              "carbon_snapshot",
+              "cost_snapshot",
+              "failure_record",
+              "maintenance_record",
+              "security_event",
+              "policy_snapshot",
+              "scheduler_log",
+              "migration_log",
+              "checkpoint_record",
+              "manual_record",
+              "other"
+            ]
+          },
+
+          "ref": {
+            "type": "string",
+            "minLength": 1
+          },
+
+          "digest": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}
