@@ -230,3 +230,28 @@ but also:
 Why was the computation placed there?
 
 The Compute Placement Receipt Protocol provides a minimal trace layer for that question.
+
+## v0.2 — Candidate Node Evaluation
+
+Version 0.2 extends the protocol from a single placement result to the evaluation context that produced the decision.
+
+The lifecycle is:
+
+```text
+Workload
+    ↓
+Candidate Discovery
+    ↓
+Candidate Node Set
+    ↓
+Evaluation Dimensions
+    ↓
+Eligibility Check
+    ↓
+Candidate Comparison
+    ↓
+Selection / Rejection
+    ↓
+Candidate Node Evaluation Record
+    ↓
+Placement Decision Receipt
