@@ -1,0 +1,431 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/candidate-node-evaluation.schema.json",
+
+  "title": "Candidate Node Evaluation",
+
+  "description": "A machine-readable record of candidate compute nodes, evaluation dimensions, eligibility results, selection rationale, and rejection reasons used during AI workload placement.",
+
+  "type": "object",
+
+  "additionalProperties": false,
+
+  "required": [
+    "schema_version",
+    "protocol",
+    "evaluation_id",
+    "workload_ref",
+    "evaluation_dimensions",
+    "candidates",
+    "selected_candidate",
+    "evaluation_at",
+    "evaluator",
+    "evidence_refs"
+  ],
+
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "0.2"
+    },
+
+    "protocol": {
+      "type": "string",
+      "const": "compute-placement-receipt-protocol"
+    },
+
+    "evaluation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+
+    "placement_receipt_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+
+    "workload_ref": {
+      "type": "object",
+
+      "additionalProperties": false,
+
+      "required": [
+        "workload_id"
+      ],
+
+      "properties": {
+        "workload_id": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "task_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "model_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+
+    "evaluation_dimensions": {
+      "type": "array",
+
+      "minItems": 1,
+
+      "uniqueItems": true,
+
+      "items": {
+        "type": "string",
+
+        "enum": [
+          "latency",
+          "capacity",
+          "gpu_type",
+          "accelerator_compatibility",
+          "memory",
+          "energy_cost",
+          "carbon_intensity",
+          "financial_cost",
+          "data_residency",
+          "security_policy",
+          "network_condition",
+          "availability",
+          "reliability",
+          "model_compatibility",
+          "workload_priority",
+          "other"
+        ]
+      }
+    },
+
+    "candidates": {
+      "type": "array",
+
+      "minItems": 1,
+
+      "items": {
+        "type": "object",
+
+        "additionalProperties": false,
+
+        "required": [
+          "node_id",
+          "node_type",
+          "eligibility",
+          "evaluation_results",
+          "decision"
+        ],
+
+        "properties": {
+          "node_id": {
+            "type": "string",
+            "minLength": 1
+          },
+
+          "node_type": {
+            "type": "string",
+
+            "enum": [
+              "edge_device",
+              "edge_cluster",
+              "regional_datacenter",
+              "cloud_region",
+              "gpu_cluster",
+              "npu_device",
+              "cpu_cluster",
+              "other"
+            ]
+          },
+
+          "provider": {
+            "type": "string",
+            "minLength": 1
+          },
+
+          "region": {
+            "type": "string",
+            "minLength": 1
+          },
+
+          "eligibility": {
+            "type": "object",
+
+            "additionalProperties": false,
+
+            "required": [
+              "status"
+            ],
+
+            "properties": {
+              "status": {
+                "type": "string",
+
+                "enum": [
+                  "eligible",
+                  "conditionally_eligible",
+                  "ineligible"
+                ]
+              },
+
+              "failed_constraints": {
+                "type": "array",
+
+                "uniqueItems": true,
+
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+
+              "conditions": {
+                "type": "array",
+
+                "uniqueItems": true,
+
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          },
+
+          "evaluation_results": {
+            "type": "array",
+
+            "minItems": 1,
+
+            "items": {
+              "type": "object",
+
+              "additionalProperties": false,
+
+              "required": [
+                "dimension",
+                "status"
+              ],
+
+              "properties": {
+                "dimension": {
+                  "type": "string",
+
+                  "enum": [
+                    "latency",
+                    "capacity",
+                    "gpu_type",
+                    "accelerator_compatibility",
+                    "memory",
+                    "energy_cost",
+                    "carbon_intensity",
+                    "financial_cost",
+                    "data_residency",
+                    "security_policy",
+                    "network_condition",
+                    "availability",
+                    "reliability",
+                    "model_compatibility",
+                    "workload_priority",
+                    "other"
+                  ]
+                },
+
+                "status": {
+                  "type": "string",
+
+                  "enum": [
+                    "pass",
+                    "acceptable",
+                    "preferred",
+                    "warning",
+                    "fail",
+                    "not_evaluated"
+                  ]
+                },
+
+                "observed_value": {
+                  "type": [
+                    "string",
+                    "number",
+                    "integer",
+                    "boolean"
+                  ]
+                },
+
+                "unit": {
+                  "type": "string",
+                  "minLength": 1
+                },
+
+                "policy_ref": {
+                  "type": "string",
+                  "minLength": 1
+                },
+
+                "evidence_ref": {
+                  "type": "string",
+                  "minLength": 1
+                },
+
+                "note": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          },
+
+          "decision": {
+            "type": "object",
+
+            "additionalProperties": false,
+
+            "required": [
+              "status",
+              "reason_codes",
+              "summary"
+            ],
+
+            "properties": {
+              "status": {
+                "type": "string",
+
+                "enum": [
+                  "selected",
+                  "rejected",
+                  "reserve",
+                  "not_selected"
+                ]
+              },
+
+              "reason_codes": {
+                "type": "array",
+
+                "minItems": 1,
+
+                "uniqueItems": true,
+
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+
+              "summary": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "selected_candidate": {
+      "type": "object",
+
+      "additionalProperties": false,
+
+      "required": [
+        "node_id",
+        "selection_summary"
+      ],
+
+      "properties": {
+        "node_id": {
+          "type": "string",
+          "minLength": 1
+        },
+
+        "selection_summary": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+
+    "evaluation_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+
+    "evaluator": {
+      "type": "object",
+
+      "additionalProperties": false,
+
+      "required": [
+        "actor_type",
+        "actor_id"
+      ],
+
+      "properties": {
+        "actor_type": {
+          "type": "string",
+
+          "enum": [
+            "scheduler",
+            "agent",
+            "human",
+            "policy_engine",
+            "hybrid"
+          ]
+        },
+
+        "actor_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+
+    "evidence_refs": {
+      "type": "array",
+
+      "items": {
+        "type": "object",
+
+        "additionalProperties": false,
+
+        "required": [
+          "evidence_type",
+          "ref"
+        ],
+
+        "properties": {
+          "evidence_type": {
+            "type": "string",
+
+            "enum": [
+              "scheduler_log",
+              "policy_snapshot",
+              "telemetry_snapshot",
+              "capacity_snapshot",
+              "energy_snapshot",
+              "carbon_snapshot",
+              "cost_snapshot",
+              "network_snapshot",
+              "security_snapshot",
+              "manual_record",
+              "other"
+            ]
+          },
+
+          "ref": {
+            "type": "string",
+            "minLength": 1
+          },
+
+          "digest": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}
