@@ -255,3 +255,79 @@ Selection / Rejection
 Candidate Node Evaluation Record
     ↓
 Placement Decision Receipt
+
+The evaluation record can preserve:
+
+candidate node identity,
+node type and region,
+eligibility status,
+failed constraints,
+conditional requirements,
+evaluation dimensions,
+observed values,
+policy references,
+supporting evidence,
+selection status,
+rejection reasons,
+final selection summary.
+Eligibility and Selection Are Different
+
+A candidate may be technically eligible without being selected.
+
+Eligible
+   ↓
+Meets mandatory constraints
+
+Selected
+   ↓
+Chosen among eligible candidates
+
+This distinction allows the protocol to record whether a node:
+
+could not execute the workload,
+could execute the workload but was not preferred,
+was retained as a reserve candidate,
+or was selected for placement.
+Rejected Candidates Are Evidence
+
+The protocol treats rejection records as first-class placement evidence.
+
+A useful placement history should answer not only:
+
+Why was this node selected?
+
+but also:
+
+Why were the alternatives not selected?
+
+Example:
+
+Tokyo GPU
+  └─ eligible
+  └─ rejected: capacity pressure
+
+Osaka GPU
+  └─ eligible
+  └─ rejected: energy cost threshold
+
+Fukuoka GPU
+  └─ eligible
+  └─ selected:
+       sufficient capacity
+       acceptable latency
+       lower energy cost
+Algorithm Neutrality
+
+The protocol does not require a universal scoring method.
+
+Candidate evaluation may be produced by:
+
+weighted scoring,
+rule-based scheduling,
+constraint satisfaction,
+policy engines,
+agent reasoning,
+human review,
+or hybrid decision systems.
+
+The protocol records the resulting evaluation context without prescribing the decision algorithm.
