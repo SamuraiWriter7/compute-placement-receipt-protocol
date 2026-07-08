@@ -1,0 +1,213 @@
+schema_version: "0.4"
+
+protocol: "compute-placement-receipt-protocol"
+
+migration_receipt_id: "cprp-migration-20260708-0001"
+
+route_binding_ref: "cprp-route-20260708-0001"
+
+previous_placement_receipt_ref: "cprp-20260708-0001"
+
+candidate_evaluation_ref: "cprp-eval-rebalance-20260708-0002"
+
+
+workload_ref:
+
+  workload_id: "workload-research-042"
+
+  task_ref: "task-deep-research-042"
+
+  model_ref: "model-research-large-v3"
+
+  execution_ref: "execution-research-042-01"
+
+
+previous_placement:
+
+  node_id: "fukuoka-gpu-003"
+
+  node_type: "gpu_cluster"
+
+  region: "JP-FUK"
+
+  placement_started_at: "2026-07-08T00:30:30Z"
+
+
+trigger:
+
+  trigger_type: "capacity"
+
+  trigger_codes:
+
+    - "capacity_pressure"
+
+    - "queue_depth_growth"
+
+    - "projected_sla_risk"
+
+  severity: "high"
+
+  detected_at: "2026-07-08T01:02:00Z"
+
+  summary: >
+    Sustained capacity pressure and queue growth increased the projected
+    risk of violating workload latency policy.
+
+
+state_change:
+
+  - dimension: "capacity"
+
+    before: 41
+
+    after: 91
+
+    unit: "percent-utilized"
+
+    threshold_ref: "policy://capacity/rebalance-above-85"
+
+    evidence_ref: "evidence://capacity/fukuoka-gpu-003/20260708T010200Z"
+
+
+  - dimension: "queue_depth"
+
+    before: 7
+
+    after: 46
+
+    unit: "jobs"
+
+    threshold_ref: "policy://queue/research-interactive-max-30"
+
+    evidence_ref: "evidence://queue/fukuoka-gpu-003/20260708T010200Z"
+
+
+  - dimension: "latency"
+
+    before: 27
+
+    after: 39
+
+    unit: "ms"
+
+    threshold_ref: "policy://latency/jp-interactive-v1"
+
+    evidence_ref: "evidence://network/fukuoka-gpu-003/20260708T010200Z"
+
+
+re_evaluation:
+
+  required: true
+
+  evaluation_status: "completed"
+
+  candidate_evaluation_ref: "cprp-eval-rebalance-20260708-0002"
+
+  policy_refs:
+
+    - "policy://capacity/rebalance-above-85"
+
+    - "policy://latency/jp-interactive-v1"
+
+    - "policy://data-residency/jp-only"
+
+    - "policy://migration/preserve-active-research-state-v1"
+
+  summary: >
+    Re-evaluation was initiated after capacity and latency thresholds
+    exceeded the configured adaptive placement policy.
+
+
+migration_decision:
+
+  decision: "migrate"
+
+  decision_mode: "adaptive"
+
+  reason_codes:
+
+    - "source_capacity_pressure"
+
+    - "latency_degradation"
+
+    - "destination_capacity_available"
+
+    - "jp_residency_preserved"
+
+    - "stateful_migration_supported"
+
+  summary: >
+    The workload was migrated to maintain latency policy while preserving
+    execution state and Japanese data residency requirements.
+
+
+destination_placement:
+
+  node_id: "kanazawa-gpu-004"
+
+  node_type: "gpu_cluster"
+
+  region: "JP-KNZ"
+
+  placement_receipt_ref: "cprp-20260708-0002"
+
+  selection_summary: >
+    Kanazawa was selected because it provided sufficient available GPU
+    capacity, acceptable network latency, and compatible stateful migration
+    support.
+
+
+migration_execution:
+
+  strategy: "warm_migration"
+
+  status: "completed"
+
+  state_preservation: "full"
+
+  started_at: "2026-07-08T01:04:10Z"
+
+  completed_at: "2026-07-08T01:05:42Z"
+
+  execution_ref: "migration-execution-20260708-0001"
+
+  summary: >
+    The active workload checkpoint was transferred and resumed on the
+    destination node without loss of execution state.
+
+
+decided_at: "2026-07-08T01:03:40Z"
+
+
+decision_actor:
+
+  actor_type: "orchestrator"
+
+  actor_id: "adaptive-placement-orchestrator-alpha"
+
+
+evidence_refs:
+
+  - evidence_type: "capacity_snapshot"
+
+    ref: "evidence://capacity/fukuoka-gpu-003/20260708T010200Z"
+
+
+  - evidence_type: "network_snapshot"
+
+    ref: "evidence://network/jp-distributed-route/20260708T010200Z"
+
+
+  - evidence_type: "policy_snapshot"
+
+    ref: "policy-snapshot://adaptive-placement-v2/20260708"
+
+
+  - evidence_type: "migration_log"
+
+    ref: "evidence://migration/execution-20260708-0001"
+
+
+  - evidence_type: "checkpoint_record"
+
+    ref: "evidence://checkpoint/workload-research-042/cp-017"
